@@ -497,6 +497,7 @@ extension EventGenerator {
                 throw HammerError.touchForFingerDoesNotExist(index: finger.fingerIndex)
             }
 
+            try self.activeTouches.update(finger: finger, forIdentifier: existingIdentifier)
             return existingIdentifier
         case .ended, .cancelled:
             guard let existingIdentifier = existingIdentifier else {
