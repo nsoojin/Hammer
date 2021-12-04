@@ -117,7 +117,8 @@ public final class EventGenerator {
 
     /// Returns if the window is ready to receive user interaction events
     public var isWindowReady: Bool {
-        guard self.window.isHidden == false
+        guard !UIApplication.shared.isIgnoringInteractionEvents
+                && self.window.isHidden == false
                 && self.window.isUserInteractionEnabled
                 && self.window.rootViewController?.viewIfLoaded != nil
                 && self.window.rootViewController?.isBeingPresented == false
@@ -130,10 +131,6 @@ public final class EventGenerator {
 
         if #available(iOS 13.0, *) {
             guard self.window.windowScene?.activationState == .foregroundActive else {
-                return false
-            }
-        } else {
-            guard !UIApplication.shared.isIgnoringInteractionEvents else {
                 return false
             }
         }
@@ -162,12 +159,7 @@ public final class EventGenerator {
             throw HammerError.unableToAccessPrivateApi(type: "UIApplication", method: "Protocol")
         }
 
-        let contextID = window.contextId
-        guard contextID != 0 else {
-            throw HammerError.unableToAccessPrivateApi(type: "UIWindow", method: "ContextID")
-        }
-
-        BackBoardServices.shared.eventSetDigitizerInfo(event, contextID, false, false, nil, 0, 0)
+        BackBoardServices.shared.eventSetDigitizerInfo(event, window.contextId, false, false, nil, 0, 0)
 
         app.enqueue(event)
 
